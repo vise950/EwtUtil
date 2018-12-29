@@ -1,9 +1,7 @@
 package com.ewt.nicola.realm
 
 
-import io.realm.Realm
-import io.realm.RealmList
-import io.realm.RealmModel
+import io.realm.*
 import io.realm.exceptions.RealmException
 import io.realm.kotlin.deleteFromRealm
 import kotlinx.coroutines.Dispatchers
@@ -112,3 +110,22 @@ fun <E : RealmList<out RealmModel>> E.save(realm: Realm, removeOld: Boolean): Re
         return promise
     }
 }
+
+
+/**
+ *  UTILS
+ */
+
+fun <T : RealmModel> RealmResults<T>.asLiveData() = RealmLiveData(this)
+
+fun List<String>.toRealmList(): RealmList<String> {
+    val realmList = RealmList<String>()
+    this.forEach { if (it.isNotEmpty()) realmList.add(it) }
+    return realmList
+}
+
+fun <T : RealmObject> RealmQuery<T>.getBy(id: String, fieldName: String = "id"): T? =
+    this.equalTo(fieldName, id).findFirst()
+
+fun <T : RealmObject> RealmQuery<T>.getAllBy(id: String, fieldName: String = "id"): RealmResults<T> =
+    this.equalTo(fieldName, id).findAll()

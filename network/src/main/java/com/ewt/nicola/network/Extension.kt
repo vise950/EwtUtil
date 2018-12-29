@@ -10,12 +10,13 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
-//todo documentation
+/**
+ *
+ */
 fun <T> Deferred<Response<T>>.get(onSuccess: (T) -> Unit, onError: (Throwable) -> Unit) {
     GlobalScope.launch {
         this@get.await().let {
             if (it.isSuccessful) {
-                Log.e("TAG", "1")
                 onSuccess.invoke(it.body()!!)
             } else {
                 onError.invoke(Throwable(it.errorBody()?.string()))
@@ -24,6 +25,9 @@ fun <T> Deferred<Response<T>>.get(onSuccess: (T) -> Unit, onError: (Throwable) -
     }
 }
 
+/**
+ *
+ */
 fun <T : RealmModel> Deferred<Response<T>>.getAndAddObjectToRealm(
     realm: Realm,
     onSuccess: () -> Unit,
@@ -32,10 +36,8 @@ fun <T : RealmModel> Deferred<Response<T>>.getAndAddObjectToRealm(
     GlobalScope.launch {
         this@getAndAddObjectToRealm.await().let {
             if (it.isSuccessful) {
-                Log.e("TAG", "1")
                 it.body()!!.save(realm)
                     .then {
-                        Log.e("TAG", "5")
                         onSuccess.invoke()
                     }
                     .onError { onError.invoke(it) }
@@ -46,6 +48,9 @@ fun <T : RealmModel> Deferred<Response<T>>.getAndAddObjectToRealm(
     }
 }
 
+/**
+ *
+ */
 fun <T : RealmList<out RealmModel>> Deferred<Response<T>>.getAndAddListToRealm(
     realm: Realm,
     removeOld: Boolean,
@@ -55,10 +60,8 @@ fun <T : RealmList<out RealmModel>> Deferred<Response<T>>.getAndAddListToRealm(
     GlobalScope.launch {
         this@getAndAddListToRealm.await().let {
             if (it.isSuccessful) {
-                Log.e("TAG", "1")
                 it.body()!!.save(realm, removeOld)
                     .then {
-                        Log.e("TAG", "5")
                         onSuccess.invoke()
                     }
                     .onError { onError.invoke(it) }

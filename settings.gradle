@@ -1,1 +1,1 @@
-include ':app', ':network', ':realm'
+include ':app', ':network', ':realm', ':common'
