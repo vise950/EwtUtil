@@ -14,10 +14,39 @@ import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.ewt.nicola.common.BuildConfig
 import com.ewt.nicola.common.R
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.reflect.KClass
+
+fun Any?.log(obj: Any? = null) {
+    val logger = when (obj) {
+        is KClass<*> -> obj.java.simpleName
+        is Class<*> -> obj.simpleName
+        is String -> obj
+        null -> "Default"
+        else -> obj.javaClass.simpleName
+    }
+
+    val message = when (this) {
+        is String? -> this ?: "NullString"
+        is Int? -> if (this == null) "NullInt" else "Int: $this"
+        is Float? -> if (this == null) "NullFloat" else "Float: $this"
+        is Double? -> if (this == null) "NullDouble" else "Double: $this"
+        else -> if (this == null) "NullValue" else "Value: $this"
+    }
+    android.util.Log.e(logger, message)
+}
+
+inline fun <reified E> Activity.goto(finished: Boolean = false, clearTask: Boolean = false, block: (Intent) -> Unit = {}) {
+    val i = Intent(this, E::class.java)
+    if (clearTask) i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+    block.invoke(i)
+    startActivity(i)
+    if (finished) this.finish()
+}
 
 inline fun <reified E> Context.goto(block: (Intent) -> Unit = {}) {
     val i = Intent(this, E::class.java)
@@ -26,7 +55,7 @@ inline fun <reified E> Context.goto(block: (Intent) -> Unit = {}) {
 }
 
 inline fun <reified E> Fragment.goto(block: (Intent) -> Unit = {}) {
-    val i = android.content.Intent(this.requireContext(), E::class.java)
+    val i = Intent(this.requireContext(), E::class.java)
     block.invoke(i)
     startActivity(i)
 }
@@ -56,16 +85,7 @@ fun <T : Any, R : Any> Collection<T?>.whenAnyNotNull(block: (List<T>) -> R) {
     }
 }
 
-fun RecyclerView.runLayoutAnimation() {
-    val controller = AnimationUtils.loadLayoutAnimation(this.context,
-        R.anim.layout_animation_fall_down
-    )
-    this.apply {
-        layoutAnimation = controller
-        adapter?.notifyDataSetChanged()
-        scheduleLayoutAnimation()
-    }
-}
+fun isDebug() = BuildConfig.DEBUG
 
 fun Context.isTablet(): Boolean = this.resources.getBoolean(R.bool.isTablet)
 
