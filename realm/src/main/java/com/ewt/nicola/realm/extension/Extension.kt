@@ -1,6 +1,8 @@
-package com.ewt.nicola.realm
+package com.ewt.nicola.realm.extension
 
 
+import com.ewt.nicola.realm.util.RealmLiveData
+import com.ewt.nicola.realm.util.RealmPromise
 import io.realm.*
 import io.realm.exceptions.RealmException
 import io.realm.kotlin.deleteFromRealm

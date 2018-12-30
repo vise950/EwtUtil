@@ -1,4 +1,4 @@
-package com.ewt.nicola.realm
+package com.ewt.nicola.realm.util
 
 import androidx.lifecycle.LiveData
 import io.realm.RealmChangeListener

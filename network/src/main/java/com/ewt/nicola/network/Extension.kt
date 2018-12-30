@@ -1,7 +1,6 @@
 package com.ewt.nicola.network
 
-import android.util.Log
-import com.ewt.nicola.realm.save
+import com.ewt.nicola.realm.extension.save
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmModel

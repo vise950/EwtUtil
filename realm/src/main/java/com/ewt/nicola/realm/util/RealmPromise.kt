@@ -1,4 +1,4 @@
-package com.ewt.nicola.realm
+package com.ewt.nicola.realm.util
 
 class RealmPromise<T> {
     internal var action: ((T) -> Unit)? = null
