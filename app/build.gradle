@@ -38,5 +38,5 @@ dependencies {
     implementation 'com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2'
 
     // My util
-//    implementation 'com.github.vise950:EwtUtil:0.4.4'
+    implementation 'com.github.vise950:EwtUtil:0.4.4.1'
 }
