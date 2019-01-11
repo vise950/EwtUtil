@@ -1,11 +1,13 @@
 package com.ewt.nicola.common.extension
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.net.ConnectivityManager
 import android.os.Handler
 import android.util.Base64
 import android.view.animation.AnimationUtils
@@ -16,6 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.ewt.nicola.common.BuildConfig
 import com.ewt.nicola.common.R
+import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
@@ -71,6 +74,13 @@ inline fun <reified E> Context.clearTask() {
     val i = Intent(this, E::class.java)
     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
     startActivity(i)
+}
+
+@SuppressLint("MissingPermission")
+fun Context.isConnectionAvailable(): Boolean {
+    val cm = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val activeNetwork = cm.activeNetworkInfo
+    return activeNetwork != null && activeNetwork.isConnectedOrConnecting
 }
 
 fun <T : Any, R : Any> Collection<T?>.whenAllNotNull(block: (List<T>) -> R) {
@@ -157,3 +167,7 @@ inline fun <T> Iterable<T>.forEachOrEmpty(action: (T) -> Unit) {
     else
         return
 }
+
+/* kotlin coroutines */
+fun launch(runner: suspend CoroutineScope.() -> Unit) = GlobalScope.launch { runner.invoke((this)) }
+fun async(runner: suspend CoroutineScope.() -> Unit) = GlobalScope.async { runner.invoke((this)) }

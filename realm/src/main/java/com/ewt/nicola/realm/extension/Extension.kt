@@ -11,6 +11,21 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
 
+fun RealmModel.toRealm(realm: Realm, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
+    this.save(realm)
+        .then { onSuccess.invoke() }
+        .onError { onError.invoke(it) }
+}
+
+fun RealmList<out RealmModel>.toRealm(
+    realm: Realm, removeOld: Boolean,
+    onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}
+) {
+    this.save(realm, removeOld)
+        .then { onSuccess.invoke() }
+        .onError { onError.invoke(it) }
+}
+
 /**
  * Check if realm is not null and not closed
  * If true return the realm, otherwise return null and report the exception to the onError handler of the promise
@@ -126,8 +141,17 @@ fun List<String>.toRealmList(): RealmList<String> {
     return realmList
 }
 
-fun <T : RealmObject> RealmQuery<T>.getBy(id: String, fieldName: String = "id"): T? =
+fun <T : RealmObject> RealmQuery<T>.queryBy(id: String, fieldName: String = "id"): T? =
     this.equalTo(fieldName, id).findFirst()
 
-fun <T : RealmObject> RealmQuery<T>.getAllBy(id: String, fieldName: String = "id"): RealmResults<T> =
+fun <T : RealmObject> RealmQuery<T>.queryAllBy(id: String, fieldName: String = "id"): RealmResults<T> =
     this.equalTo(fieldName, id).findAll()
+
+fun <T : RealmObject> RealmQuery<T>.queryAsyncBy(id: String, fieldName: String = "id"): T? =
+    this.equalTo(fieldName, id).findFirstAsync()
+
+fun <T : RealmObject> RealmQuery<T>.queryAllAsyncBy(id: String, fieldName: String = "id"): RealmResults<T> =
+    this.equalTo(fieldName, id).findAllAsync()
+
+fun <T : RealmObject> RealmQuery<T>.queryAllAsync(): RealmResults<T> =
+    this.findAllAsync()

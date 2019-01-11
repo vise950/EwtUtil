@@ -33,7 +33,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.1'
 
     // Support
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0-rc01'
 
     // Architecture Components
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'

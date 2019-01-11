@@ -7,8 +7,7 @@ import com.ewt.nicola.ewt.R
 import com.ewt.nicola.ewt.application.Init
 import com.ewt.nicola.ewt.service.Service
 import com.ewt.nicola.network.get
-import com.ewt.nicola.network.getAndAddListToRealm
-import com.ewt.nicola.network.getAndAddObjectToRealm
+import com.ewt.nicola.realm.extension.save
 import kotlinx.android.synthetic.main.activity_1.*
 
 class Activity1 : AppCompatActivity() {
@@ -40,8 +39,9 @@ class Activity1 : AppCompatActivity() {
     private fun fetchTodo1() {
         service.create(Service::class.java)
             .getTodo()
-            .getAndAddObjectToRealm(realm, {
-                Log.e(TAG, "get and saved")
+            .get({
+                it.save(realm)
+                    .onError { Log.e(TAG, "error ", it) }
             }, {
                 Log.e(TAG, "error ", it)
             })
@@ -50,8 +50,10 @@ class Activity1 : AppCompatActivity() {
     private fun fetchTodos() {
         service.create(Service::class.java)
             .getTodos()
-            .getAndAddListToRealm(realm, false, {
+            .get({
                 Log.e(TAG, "get and saved")
+                it.save(realm, false)
+                    .onError { Log.e(TAG, "error ", it) }
             }, {
                 Log.e(TAG, "error ", it)
             })
