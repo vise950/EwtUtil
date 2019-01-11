@@ -91,7 +91,7 @@ fun <E : RealmModel> E.save(realm: Realm): Promise<E> {
  * Save network response (list) on realm
  * @param removeOld remove not received object from response from realm
  */
-fun <E : RealmList<out RealmModel>> E.save(realm: Realm, removeOld: Boolean): Promise<E> {
+fun <E : RealmList<out RealmModel>> E.save(realm: Realm, removeOld: Boolean = false): Promise<E> {
     Promise<E>().let { promise ->
         asyncUI {
             if (removeOld) {

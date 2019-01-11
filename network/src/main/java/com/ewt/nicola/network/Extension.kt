@@ -8,16 +8,6 @@ import retrofit2.Response
 /**
  *
  */
-//fun <T> Deferred<Response<T>>.get(onSuccess: (T) -> Unit = {}, onError: (Throwable) -> Unit) {
-//    this.awaitAsync {
-//        if (it.isSuccessful) {
-//            onSuccess.invoke(it.body()!!)
-//        } else {
-//            onError.invoke(Throwable(it.errorBody()?.string()))
-//        }
-//    }
-//}
-
 fun <T> Deferred<Response<T>>.get(): Promise<T> {
     val promise = Promise<T>()
     this.awaitAsync {
