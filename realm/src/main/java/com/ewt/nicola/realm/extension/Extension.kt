@@ -1,36 +1,18 @@
 package com.ewt.nicola.realm.extension
 
 
+import com.ewt.nicola.common.extension.asyncUI
+import com.ewt.nicola.common.util.Promise
 import com.ewt.nicola.realm.util.RealmLiveData
-import com.ewt.nicola.realm.util.RealmPromise
 import io.realm.*
 import io.realm.exceptions.RealmException
 import io.realm.kotlin.deleteFromRealm
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-
-
-fun RealmModel.toRealm(realm: Realm, onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}) {
-    this.save(realm)
-        .then { onSuccess.invoke() }
-        .onError { onError.invoke(it) }
-}
-
-fun RealmList<out RealmModel>.toRealm(
-    realm: Realm, removeOld: Boolean,
-    onSuccess: () -> Unit = {}, onError: (Throwable) -> Unit = {}
-) {
-    this.save(realm, removeOld)
-        .then { onSuccess.invoke() }
-        .onError { onError.invoke(it) }
-}
 
 /**
  * Check if realm is not null and not closed
  * If true return the realm, otherwise return null and report the exception to the onError handler of the promise
  **/
-fun <T> RealmPromise<T>?.checkRealmStatus(realm: Realm?): Realm? {
+fun <T> Promise<T>?.checkRealmStatus(realm: Realm?): Realm? {
     realm?.let {
         return if (it.isClosed) {
             this?.error?.invoke(RealmException("Realm is closed"))
@@ -47,8 +29,8 @@ fun <T> RealmPromise<T>?.checkRealmStatus(realm: Realm?): Realm? {
 /**
  * Execute an async transaction in a safe realm
  **/
-fun Realm?.safeExec(async: (Realm) -> Unit): RealmPromise<Boolean> {
-    val promise = RealmPromise<Boolean>()
+fun Realm?.safeExec(async: (Realm) -> Unit): Promise<Boolean> {
+    val promise = Promise<Boolean>()
     promise.checkRealmStatus(this)?.let { realm ->
         realm.executeTransactionAsync(
             { async(it) },
@@ -62,13 +44,13 @@ fun Realm?.safeExec(async: (Realm) -> Unit): RealmPromise<Boolean> {
 /**
  * Insert on update object into realm db
  */
-fun <E : RealmModel> Realm?.addOrUpdate(obj: E): RealmPromise<E> {
-    RealmPromise<E>().let { promise ->
+fun <E : RealmModel> Realm?.addOrUpdate(obj: E): Promise<E> {
+    Promise<E>().let { promise ->
         this.safeExec {
             it.insertOrUpdate(obj)
         } then {
             promise.action?.invoke(obj)
-        } onError {
+        } error {
             promise.error?.invoke(it)
         }
         return promise
@@ -78,13 +60,13 @@ fun <E : RealmModel> Realm?.addOrUpdate(obj: E): RealmPromise<E> {
 /**
  * Insert or update list into realm db
  */
-fun <E : RealmModel> Realm?.addOrUpdate(list: RealmList<E>): RealmPromise<RealmList<E>> {
-    RealmPromise<RealmList<E>>().let { promise ->
+fun <E : RealmModel> Realm?.addOrUpdate(list: RealmList<E>): Promise<RealmList<E>> {
+    Promise<RealmList<E>>().let { promise ->
         this.safeExec {
             it.insertOrUpdate(list)
         } then {
             promise.action?.invoke(list)
-        } onError {
+        } error {
             promise.error?.invoke(it)
         }
         return promise
@@ -94,12 +76,12 @@ fun <E : RealmModel> Realm?.addOrUpdate(list: RealmList<E>): RealmPromise<RealmL
 /**
  * Save network response (object) on realm
  */
-fun <E : RealmModel> E.save(realm: Realm): RealmPromise<E> {
-    RealmPromise<E>().let { promise ->
-        GlobalScope.async(Dispatchers.Main) {
+fun <E : RealmModel> E.save(realm: Realm): Promise<E> {
+    Promise<E>().let { promise ->
+        asyncUI {
             realm.addOrUpdate(this@save)
                 .then { promise.action?.invoke(it) }
-                .onError { promise.error?.invoke(it) }
+                .error { promise.error?.invoke(it) }
         }
         return promise
     }
@@ -109,9 +91,9 @@ fun <E : RealmModel> E.save(realm: Realm): RealmPromise<E> {
  * Save network response (list) on realm
  * @param removeOld remove not received object from response from realm
  */
-fun <E : RealmList<out RealmModel>> E.save(realm: Realm, removeOld: Boolean): RealmPromise<E> {
-    RealmPromise<E>().let { promise ->
-        GlobalScope.async(Dispatchers.Main) {
+fun <E : RealmList<out RealmModel>> E.save(realm: Realm, removeOld: Boolean): Promise<E> {
+    Promise<E>().let { promise ->
+        asyncUI {
             if (removeOld) {
                 val items = this@save.firstOrNull()?.let { realm.where(it::class.java).findAll() }
                 this@save.forEach {
@@ -122,7 +104,7 @@ fun <E : RealmList<out RealmModel>> E.save(realm: Realm, removeOld: Boolean): Re
                 .then {
                     promise.action?.invoke(it as E)
                 }
-                .onError { promise.error?.invoke(it) }
+                .error { promise.error?.invoke(it) }
         }
         return promise
     }
@@ -152,6 +134,3 @@ fun <T : RealmObject> RealmQuery<T>.queryAsyncBy(id: String, fieldName: String =
 
 fun <T : RealmObject> RealmQuery<T>.queryAllAsyncBy(id: String, fieldName: String = "id"): RealmResults<T> =
     this.equalTo(fieldName, id).findAllAsync()
-
-fun <T : RealmObject> RealmQuery<T>.queryAllAsync(): RealmResults<T> =
-    this.findAllAsync()

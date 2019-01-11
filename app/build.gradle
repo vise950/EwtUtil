@@ -26,6 +26,7 @@ dependencies {
 
     implementation project(':network')
     implementation project(':realm')
+    implementation project(':common')
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

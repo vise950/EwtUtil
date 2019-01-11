@@ -1,20 +1,33 @@
 package com.ewt.nicola.network
 
 import com.ewt.nicola.common.extension.launch
+import com.ewt.nicola.common.util.Promise
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
 
 /**
  *
  */
-fun <T> Deferred<Response<T>>.get(onSuccess: (T) -> Unit = {}, onError: (Throwable) -> Unit) {
+//fun <T> Deferred<Response<T>>.get(onSuccess: (T) -> Unit = {}, onError: (Throwable) -> Unit) {
+//    this.awaitAsync {
+//        if (it.isSuccessful) {
+//            onSuccess.invoke(it.body()!!)
+//        } else {
+//            onError.invoke(Throwable(it.errorBody()?.string()))
+//        }
+//    }
+//}
+
+fun <T> Deferred<Response<T>>.get(): Promise<T> {
+    val promise = Promise<T>()
     this.awaitAsync {
         if (it.isSuccessful) {
-            onSuccess.invoke(it.body()!!)
+            promise.action?.invoke(it.body()!!)
         } else {
-            onError.invoke(Throwable(it.errorBody()?.string()))
+            promise.error?.invoke(Throwable(it.errorBody().toString()))
         }
     }
+    return promise
 }
 
 fun <T> Deferred<Response<T>>.awaitAsync(block: (Response<T>) -> Unit) {
