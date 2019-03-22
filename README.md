@@ -1,4 +1,5 @@
 # EwtUtil
+[![](https://jitpack.io/v/vise950/ewtutil.svg)](https://jitpack.io/#vise950/ewtutil)
 
 Gradle Project
 ```gradle
@@ -14,6 +15,6 @@ Gradle App
 ```gradle
 dependencies {
   ...
-  implementation 'com.github.vise950:EwtUtil:0.6.1'
+  implementation 'com.github.vise950:EwtUtil:$version'
 }
 ```
