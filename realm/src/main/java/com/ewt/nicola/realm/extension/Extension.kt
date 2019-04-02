@@ -2,6 +2,7 @@ package com.ewt.nicola.realm.extension
 
 
 import com.ewt.nicola.common.extension.asyncUI
+import com.ewt.nicola.common.extension.log
 import com.ewt.nicola.common.util.Promise
 import com.ewt.nicola.realm.util.RealmLiveData
 import io.realm.*
@@ -64,10 +65,13 @@ fun <E : RealmModel> Realm?.addOrUpdate(list: RealmList<E>): Promise<RealmList<E
     Promise<RealmList<E>>().let { promise ->
         this.safeExec {
             it.insertOrUpdate(list)
+            "insert list".log()
         } then {
             promise.action?.invoke(list)
+            "insert list OK".log()
         } error {
             promise.error?.invoke(it)
+            "insert list KO".log()
         }
         return promise
     }
@@ -90,17 +94,19 @@ fun <E : RealmModel> E.save(realm: Realm, beforeSave: ((E) -> Unit)? = null): Pr
 
 /**
  * Save network response (list) on realm
- * @param removeOld remove not received objects in the response from realm db
+ * @param removeInvalid remove not received objects in the response from realm db
  */
 fun <E : RealmList<out RealmModel>> E.save(
     realm: Realm,
     beforeSave: ((E) -> Unit)? = null,
-    removeOld: Boolean = false
+    removeInvalid: Boolean = false
 ): Promise<E> {
     Promise<E>().let { promise ->
         asyncUI {
             beforeSave?.invoke(this@save)
-            if (removeOld) this@save.removeInvalidObject(realm)
+            if (removeInvalid) this@save.removeInvalidObject(realm)
+            "finish remove old object".log()
+            //fixme remove old work only first time when db is empty
             realm.addOrUpdate(this@save)
                 .then {
                     promise.action?.invoke(it as E)
@@ -114,7 +120,12 @@ fun <E : RealmList<out RealmModel>> E.save(
 fun <E : RealmList<out RealmModel>> E.removeInvalidObject(realm: Realm) {
     val items = this.firstOrNull()?.let { realm.where(it::class.java).findAll() }
     items?.forEach {
-        if (!this.contains(it)) it.deleteFromRealm()
+        "foreach".log()
+        if (!this.contains(it as RealmModel)) {
+            "remove old object".log()
+            it.deleteFromRealm()
+        } else
+            return@forEach
     }
 }
 

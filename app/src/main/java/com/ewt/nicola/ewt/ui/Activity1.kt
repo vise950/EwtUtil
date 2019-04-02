@@ -45,7 +45,7 @@ class Activity1 : AppCompatActivity() {
             .getTodos()
             .get()
             .then {
-                it.save(realm, removeOld = true)
+                it.save(realm, removeInvalid = true)
                     .then { "saved on realm".log() }
             }
             .error { it.log("fetchTodos") }
