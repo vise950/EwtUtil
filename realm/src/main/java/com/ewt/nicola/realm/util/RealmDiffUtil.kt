@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.DiffUtil
 import io.realm.RealmModel
 import io.realm.kotlin.isValid
 
-class GenericDiffUtil<T : RealmModel>(private val oldData: List<T>, private val newData: List<T>) :
+class RealmDiffUtil<T : RealmModel>(private val oldData: List<T>, private val newData: List<T>) :
     DiffUtil.Callback() {
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {

@@ -7,19 +7,13 @@
     <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_1"
             android:layout_width="wrap_content"
-            android:text="Button 1"
+            android:text="single object"
             android:layout_height="wrap_content"/>
 
     <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_2"
             android:layout_width="wrap_content"
-            android:text="Button 2"
-            android:layout_height="wrap_content"/>
-
-    <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_3"
-            android:layout_width="wrap_content"
-            android:text="Button 3"
+            android:text="°List of objects"
             android:layout_height="wrap_content"/>
 
 </LinearLayout>

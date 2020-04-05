@@ -6,11 +6,11 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
     }
@@ -33,10 +33,10 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines_version"
 
     // Support
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0-rc01'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
     // Architecture Components
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
-    kapt "androidx.lifecycle:lifecycle-compiler:2.0.0"
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
+    kapt "androidx.lifecycle:lifecycle-compiler:2.1.0"
 }

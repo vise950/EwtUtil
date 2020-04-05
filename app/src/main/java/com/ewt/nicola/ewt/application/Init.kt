@@ -2,7 +2,6 @@ package com.ewt.nicola.ewt.application
 
 import android.annotation.SuppressLint
 import android.app.Application
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import okhttp3.OkHttpClient
@@ -47,7 +46,6 @@ class Init : Application() {
                 Retrofit.Builder()
                     .baseUrl("https://jsonplaceholder.typicode.com/")
                     .client(getOkHttpClient())
-                    .addCallAdapterFactory(CoroutineCallAdapterFactory())
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                     .also {

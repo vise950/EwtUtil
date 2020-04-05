@@ -25,3 +25,15 @@ private fun <T> Deferred<Response<T>>.awaitAsync(block: (Response<T>) -> Unit) {
         this@awaitAsync.await().let { block.invoke(it) }
     }
 }
+
+
+
+fun <T> Response<T>.make(): Promise<T> {
+    val promise = Promise<T>()
+    if (this.isSuccessful) {
+        promise.action?.invoke(this.body()!!)
+    } else {
+        promise.error?.invoke(Throwable(this.errorBody().toString()))
+    }
+    return promise
+}
